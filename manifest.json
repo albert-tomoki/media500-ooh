@@ -1,0 +1,21 @@
+{
+  "name": "Media 500 Calculadora OOH",
+  "short_name": "Media 500 OOH",
+  "description": "Calculadora de Impacto Vía Pública - Media 500",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#1f2937",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/N29Ts7WX/Logo-media-500-CIRCULAR-jpg.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://i.ibb.co/N29Ts7WX/Logo-media-500-CIRCULAR-jpg.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

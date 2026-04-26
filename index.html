@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media 500 — Plataforma OOH</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1f2937">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #111827; color: #f9fafb; min-height: 100vh; }
+
+        /* HEADER */
+        .header { text-align: center; padding: 24px 20px 16px; border-bottom: 1px solid #1f2937; }
+        .header img { max-width: 80px; border-radius: 50%; margin-bottom: 12px; }
+        .header h1 { font-size: 22px; color: #60a5fa; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* TABS */
+        .tabs { display: flex; background: #1f2937; border-bottom: 2px solid #374151; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab { flex: 1; min-width: 0; padding: 14px 8px; text-align: center; cursor: pointer; color: #6b7280; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .tab:hover { color: #9ca3af; }
+        .tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+        .tab .tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+        /* TAB CONTENT */
+        .tab-content { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* SECTION TITLE */
+        .section-title { font-size: 18px; color: #60a5fa; margin-bottom: 20px; font-weight: 700; }
+
+        /* CARDS & PANELS */
+        .panel { background-color: #1f2937; padding: 24px; border-radius: 12px; border: 1px solid #374151; margin-bottom: 20px; }
+        .panel h3 { font-size: 14px; color: #9ca3af; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        .stat-card { background: rgba(17, 24, 39, 0.8); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #374151; }
+        .stat-card .label { font-size: 12px; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #fff; }
+        .stat-card .sub { font-size: 13px; color: #34d399; font-weight: 600; margin-top: 4px; }
+        .stat-card .unit { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+        .highlight-card { background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); padding: 28px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); }
+        .highlight-card .label { font-size: 14px; color: #bfdbfe; text-transform: uppercase; margin-bottom: 8px; }
+        .highlight-card .value { font-size: 42px; font-weight: 700; color: #fff; }
+        .highlight-card .sub { font-size: 15px; color: #93c5fd; font-weight: 600; margin-top: 4px; }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; color: #9ca3af; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #4b5563; background-color: #374151; color: white; font-size: 15px; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #60a5fa; }
+        .form-group input::placeholder { color: #6b7280; }
+        .form-row { display: flex; gap: 12px; }
+        .form-row > .form-group { flex: 1; }
+
+        /* BUTTONS */
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; font-size: 12px; padding: 6px 12px; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: transparent; color: #60a5fa; border: 1px solid #374151; }
+        .btn-outline:hover { border-color: #60a5fa; }
+        .btn-block { width: 100%; justify-content: center; }
+        .btn-sm { padding: 8px 14px; font-size: 13px; }
+
+        /* FILTER BAR */
+        .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .filter-bar input, .filter-bar select { padding: 10px 14px; border-radius: 8px; border: 1px solid #4b5563; background-color: #374151; color: white; font-size: 14px; outline: none; flex: 1; min-width: 140px; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #60a5fa; }
+
+        /* LINE SELECTOR LIST */
+        .line-list { display: none; max-height: 300px; overflow-y: auto; background: #1f2937; border: 1px solid #374151; border-radius: 8px; margin-bottom: 16px; }
+        .line-list.visible { display: block; }
+        .line-item { display: flex; align-items: center; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #374151; transition: 0.15s; }
+        .line-item:hover { background: #374151; }
+        .line-item:last-child { border-bottom: none; }
+        .line-item .line-num { font-weight: 700; color: #60a5fa; min-width: 60px; font-size: 15px; }
+        .line-item .line-zones { color: #6b7280; font-size: 12px; flex: 1; }
+        .line-item .line-impact { color: #34d399; font-size: 13px; font-weight: 600; }
+
+        /* CAMPAIGN LINES TABLE */
+        .campaign-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        .campaign-table th { text-align: left; padding: 10px 8px; color: #6b7280; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #374151; }
+        .campaign-table td { padding: 10px 8px; border-bottom: 1px solid #1f2937; font-size: 14px; vertical-align: middle; }
+        .campaign-table .line-col { color: #60a5fa; font-weight: 700; }
+        .campaign-table .remove-col { text-align: right; }
+
+        /* COMPARISON BARS */
+        .compare-row { display: flex; align-items: center; margin-bottom: 12px; }
+        .compare-row .compare-label { width: 110px; font-size: 13px; color: #9ca3af; flex-shrink: 0; }
+        .compare-row .compare-bar-container { flex: 1; background: #111827; border-radius: 6px; height: 28px; position: relative; overflow: hidden; }
+        .compare-row .compare-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 700; color: white; transition: width 0.5s ease; }
+        .compare-row .compare-value { font-size: 13px; color: #f9fafb; font-weight: 600; min-width: 90px; text-align: right; margin-left: 10px; }
+
+        /* REPORT PREVIEW */
+        .report-preview { background: #fff; color: #111; padding: 32px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        .report-preview h2 { color: #1d4ed8; font-size: 20px; margin-bottom: 12px; }
+        .report-preview .rp-section { margin-bottom: 16px; }
+        .report-preview .rp-label { font-weight: 700; color: #374151; }
+        .report-preview .rp-highlight { font-size: 28px; font-weight: 700; color: #1d4ed8; }
+        .report-preview table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .report-preview table th { background: #f3f4f6; padding: 8px; text-align: left; font-size: 12px; color: #374151; }
+        .report-preview table td { padding: 8px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+        .report-preview .rp-footer { margin-top: 20px; padding-top: 12px; border-top: 2px solid #1d4ed8; font-size: 11px; color: #6b7280; }
+
+        /* FOOTER */
+        .footer { text-align: center; font-size: 12px; color: #6b7280; margin-top: 20px; padding: 16px; border-top: 1px solid #374151; }
+        .footer a { color: #60a5fa; text-decoration: none; }
+
+        /* RANGE HINT */
+        .range-hint { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
+        /* ZONE TAGS */
+        .zone-tag { font-size: 11px; background-color: #374151; color: #d1d5db; padding: 3px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin: 1px; }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 40px 20px; color: #6b7280; }
+        .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="https://i.ibb.co/N29Ts7WX/Logo-media-500-CIRCULAR-jpg.jpg" alt="Logo Media 500">
+        <h1>Media 500 — Plataforma OOH</h1>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('impacto')"><span class="tab-icon">📊</span>Impacto</div>
+        <div class="tab" onclick="switchTab('roi')"><span class="tab-icon">💰</span>ROI</div>
+        <div class="tab" onclick="switchTab('simulador')"><span class="tab-icon">🎯</span>Simulador</div>
+        <div class="tab" onclick="switchTab('reportes')"><span class="tab-icon">📈</span>Reportes</div>
+    </div>
+
+    <!-- ==================== TAB: IMPACTO ==================== -->
+    <div class="tab-content active" id="tab-impacto">
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar línea (ej: 68)..." onkeyup="filtrarLineas()">
+            <select id="zoneFilter" onchange="filtrarLineas()">
+                <option value="ALL">Todas las Zonas</option>
+                <option value="CABA">CABA</option>
+                <option value="Norte">GBA Norte</option>
+                <option value="Oeste">GBA Oeste</option>
+                <option value="Sur">GBA Sur</option>
+            </select>
+            <select id="sortFilter" onchange="filtrarLineas()">
+                <option value="NUM">Nro. Línea</option>
+                <option value="IMPACT_DESC">Mayor Impacto</option>
+            </select>
+            <select id="lineSelect" onchange="actualizarPlaca()" style="width:100%; min-width:100%;">
+                <option value="" disabled selected>Elegí una Línea...</option>
+            </select>
+        </div>
+
+        <div class="panel" id="placa" style="display:none;">
+            <div style="border-bottom:2px solid #374151; padding-bottom:12px; margin-bottom:20px; text-align:center;">
+                <h2 id="placaTitle" style="color:#60a5fa; font-size:24px;">Línea XX</h2>
+            </div>
+            <div class="grid-2" style="margin-bottom:20px;">
+                <div class="stat-card">
+                    <div class="label">Audiencia Interna</div>
+                    <div class="value" id="pasajerosMensual">0</div>
+                    <div class="sub" id="pasajerosDiario">0 / día</div>
+                    <div class="unit">Pasajeros SUBE / mes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Audiencia Externa</div>
+                    <div class="value" id="vehiculosMensual">0</div>
+                    <div class="sub" id="vehiculosDiario">0 / día</div>
+                    <div class="unit">Tránsito Vehicular / mes</div>
+                </div>
+            </div>
+            <div class="highlight-card">
+                <div class="label">Impactos Totales Cruzados</div>
+                <div class="value" id="impactosMensual">0</div>
+                <div class="sub" id="impactosDiario">0 impactos diarios</div>
+            </div>
+            <div style="text-align:center;">
+                <button class="btn btn-success" onclick="copiarResumenImpacto()">📲 Copiar para WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB: ROI ==================== -->
+    <div class="tab-content" id="tab-roi">
+        <div class="section-title">💰 Calculadora de ROI por Línea</div>
+
+        <div class="panel">
+            <div class="filter-bar" style="margin-bottom:16px;">
+                <select id="roiLineSelect" onchange="calcularROI()" style="min-width:100%;">
+                    <option value="" disabled selected>Elegí una Línea...</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Precio por Luneta ($)</label>
+                    <input type="number" id="roiPrecio" placeholder="Ej: 70000" min="40000" max="110000" oninput="calcularROI()">
+                    <div class="range-hint">Rango habitual: $40.000 — $110.000</div>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad de Lunetas</label>
+                    <input type="number" id="roiLunetas" placeholder="Ej: 5" min="1" value="1" oninput="calcularROI()">
+                </div>
+                <div class="form-group">
+                    <label>Duración (meses)</label>
+                    <input type="number" id="roiDuracion" placeholder="1-4" min="1" max="4" value="1" oninput="calcularROI()">
+                    <div class="range-hint">Máx 4 meses (vida útil ploteo)</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="roiResults" style="display:none;">
+            <div class="grid-3" style="margin-bottom:20px;">
+                <div class="stat-card">
+                    <div class="label">Inversión Total</div>
+                    <div class="value" id="roiInversion">$0</div>
+                    <div class="unit" id="roiInversionDetail"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">CPM</div>
+                    <div class="value" id="roiCPM">$0</div>
+                    <div class="unit">Costo cada 1.000 impactos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Costo por Impacto</div>
+                    <div class="value" id="roiCPI">$0</div>
+                    <div class="unit">Por visualización</div>
+                </div>
+            </div>
+
+            <div class="highlight-card">
+                <div class="label">Impactos Totales de la Campaña</div>
+                <div class="value" id="roiImpactosTotales">0</div>
+                <div class="sub" id="roiImpactosDetail"></div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 Comparación con Otros Medios (CPM estimado)</h3>
+                <div id="roiComparison"></div>
+            </div>
+
+            <div style="text-align:center; margin-top:16px;">
+                <button class="btn btn-success" onclick="copiarResumenROI()">📲 Copiar para WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB: SIMULADOR ==================== -->
+    <div class="tab-content" id="tab-simulador">
+        <div class="section-title">🎯 Simulador de Campaña</div>
+
+        <div class="panel">
+            <h3>Agregar Línea a la Campaña</h3>
+            <div class="form-row" style="margin-top:12px;">
+                <div class="form-group" style="flex:2;">
+                    <label>Línea</label>
+                    <select id="simLineSelect">
+                        <option value="" disabled selected>Elegí línea...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lunetas</label>
+                    <input type="number" id="simLunetas" min="1" value="1" placeholder="1">
+                </div>
+                <div class="form-group">
+                    <label>$ por Luneta</label>
+                    <input type="number" id="simPrecio" placeholder="70000" min="40000" max="110000">
+                </div>
+                <div class="form-group" style="display:flex;align-items:flex-end;">
+                    <button class="btn btn-primary btn-sm" onclick="agregarLineaCampania()">+ Agregar</button>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Duración de Campaña (meses)</label>
+                    <input type="number" id="simDuracion" min="1" max="4" value="1" oninput="recalcularCampania()">
+                    <div class="range-hint">Máx 4 meses</div>
+                </div>
+                <div class="form-group">
+                    <label>Nombre del Cliente (para reporte)</label>
+                    <input type="text" id="simCliente" placeholder="Ej: Coca-Cola">
+                </div>
+            </div>
+        </div>
+
+        <div id="simCampaniaVacia" class="empty-state">
+            <div class="icon">🎯</div>
+            <div>Agregá líneas para armar tu campaña</div>
+        </div>
+
+        <div id="simCampaniaContent" style="display:none;">
+            <div class="panel" style="overflow-x:auto;">
+                <h3>Líneas en la Campaña</h3>
+                <table class="campaign-table" style="margin-top:12px;">
+                    <thead>
+                        <tr>
+                            <th>Línea</th>
+                            <th>Zona</th>
+                            <th>Lunetas</th>
+                            <th>$ por Luneta</th>
+                            <th>Impactos/mes</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="simCampaniaBody"></tbody>
+                </table>
+            </div>
+
+            <div class="grid-3" style="margin-bottom:20px;">
+                <div class="stat-card">
+                    <div class="label">Inversión Total</div>
+                    <div class="value" id="simInversion">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">CPM Campaña</div>
+                    <div class="value" id="simCPM">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total Lunetas</div>
+                    <div class="value" id="simTotalLunetas">0</div>
+                </div>
+            </div>
+
+            <div class="highlight-card">
+                <div class="label">Impactos Totales de la Campaña</div>
+                <div class="value" id="simImpactosTotales">0</div>
+                <div class="sub" id="simImpactosDetail"></div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 Comparación CPM con Otros Medios</h3>
+                <div id="simComparison"></div>
+            </div>
+
+            <div style="text-align:center; margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-success" onclick="copiarResumenSimulador()">📲 Copiar para WhatsApp</button>
+                <button class="btn btn-primary" onclick="generarReporte()">📈 Generar Reporte</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB: REPORTES ==================== -->
+    <div class="tab-content" id="tab-reportes">
+        <div class="section-title">📈 Reporte de Campaña</div>
+
+        <div id="reporteVacio" class="empty-state">
+            <div class="icon">📈</div>
+            <div>Armá una campaña en el Simulador y generá el reporte desde ahí</div>
+        </div>
+
+        <div id="reporteContent" style="display:none;">
+            <div class="report-preview" id="reportPreview"></div>
+            <div style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-success" onclick="copiarReporteTexto()">📋 Copiar Texto del Reporte</button>
+                <button class="btn btn-primary" onclick="imprimirReporte()">🖨️ Imprimir / PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Fuentes: <a href="https://datos.transporte.gob.ar/dataset/sube-operaciones-de-viaje-por-mes" target="_blank">Min. Transporte (SUBE)</a> | <a href="https://www.argentina.gob.ar/obras-publicas/vialidad-nacional/datos-abiertos" target="_blank">Dir. Nal. Vialidad (TMDA)</a>
+    </div>
+
+    <script>
+        // ============ DATA ============
+        const data = {"12":{"pasajerosMensual":420702,"tmda":30000,"impactosMensual":1320702,"zonas":["CABA"]},"41":{"pasajerosMensual":121416,"tmda":30000,"impactosMensual":1021416,"zonas":["CABA","Norte"]},"42":{"pasajerosMensual":181046,"tmda":40000,"impactosMensual":1381046,"zonas":["CABA"]},"47":{"pasajerosMensual":250000,"tmda":30000,"impactosMensual":1150000,"zonas":["CABA"]},"51":{"pasajerosMensual":25919,"tmda":20000,"impactosMensual":625919,"zonas":["Sur"]},"53":{"pasajerosMensual":22933,"tmda":30000,"impactosMensual":922933,"zonas":["CABA","Oeste"]},"57":{"pasajerosMensual":250000,"tmda":30000,"impactosMensual":1150000,"zonas":["CABA","Norte","Oeste"]},"64":{"pasajerosMensual":72825,"tmda":40000,"impactosMensual":1272825,"zonas":["CABA"]},"65":{"pasajerosMensual":172572,"tmda":30000,"impactosMensual":1072572,"zonas":["CABA"]},"67":{"pasajerosMensual":75224,"tmda":30000,"impactosMensual":975224,"zonas":["CABA"]},"68":{"pasajerosMensual":64240,"tmda":40000,"impactosMensual":1264240,"zonas":["CABA"]},"74":{"pasajerosMensual":16353,"tmda":20000,"impactosMensual":616353,"zonas":["Sur"]},"79":{"pasajerosMensual":250000,"tmda":20000,"impactosMensual":850000,"zonas":["Sur"]},"92":{"pasajerosMensual":250000,"tmda":30000,"impactosMensual":1150000,"zonas":["CABA"]},"102":{"pasajerosMensual":2324,"tmda":30000,"impactosMensual":902324,"zonas":["CABA"]},"123":{"pasajerosMensual":250000,"tmda":30000,"impactosMensual":1150000,"zonas":["CABA","Oeste"]},"124":{"pasajerosMensual":701959,"tmda":30000,"impactosMensual":1601959,"zonas":["CABA"]},"126":{"pasajerosMensual":1182005,"tmda":30000,"impactosMensual":2082005,"zonas":["CABA","Oeste"]},"136":{"pasajerosMensual":440059,"tmda":30000,"impactosMensual":1340059,"zonas":["CABA","Oeste"]},"148":{"pasajerosMensual":250000,"tmda":20000,"impactosMensual":850000,"zonas":["Sur"]},"151":{"pasajerosMensual":250000,"tmda":40000,"impactosMensual":1450000,"zonas":["CABA"]},"163":{"pasajerosMensual":277020,"tmda":30000,"impactosMensual":1177020,"zonas":["CABA","Norte","Oeste"]},"166":{"pasajerosMensual":894049,"tmda":30000,"impactosMensual":1794049,"zonas":["CABA","Oeste"]},"176":{"pasajerosMensual":1597825,"tmda":30000,"impactosMensual":2497825,"zonas":["CABA","Norte"]},"177":{"pasajerosMensual":594679,"tmda":20000,"impactosMensual":1194679,"zonas":["Sur"]},"182":{"pasajerosMensual":1113491,"tmda":30000,"impactosMensual":2013491,"zonas":["CABA","Norte","Oeste"]},"194":{"pasajerosMensual":530650,"tmda":30000,"impactosMensual":1430650,"zonas":["CABA","Norte"]},"195":{"pasajerosMensual":413138,"tmda":30000,"impactosMensual":1313138,"zonas":["CABA","Sur"]},"203":{"pasajerosMensual":2758179,"tmda":20000,"impactosMensual":3358179,"zonas":["Norte","Oeste"]},"204":{"pasajerosMensual":174016,"tmda":20000,"impactosMensual":774016,"zonas":["Norte"]},"218":{"pasajerosMensual":636423,"tmda":20000,"impactosMensual":1236423,"zonas":["Oeste"]},"222":{"pasajerosMensual":121223,"tmda":20000,"impactosMensual":721223,"zonas":["Oeste"]},"236":{"pasajerosMensual":1798120,"tmda":20000,"impactosMensual":2398120,"zonas":["Oeste"]},"237":{"pasajerosMensual":1115632,"tmda":20000,"impactosMensual":1715632,"zonas":["Oeste"]},"263":{"pasajerosMensual":904083,"tmda":20000,"impactosMensual":1504083,"zonas":["Sur"]},"264":{"pasajerosMensual":324549,"tmda":20000,"impactosMensual":924549,"zonas":["Norte"]},"269":{"pasajerosMensual":1150960,"tmda":20000,"impactosMensual":1750960,"zonas":["Oeste"]},"276":{"pasajerosMensual":800924,"tmda":20000,"impactosMensual":1400924,"zonas":["Norte"]},"283":{"pasajerosMensual":689263,"tmda":20000,"impactosMensual":1289263,"zonas":["Sur"]},"284":{"pasajerosMensual":114030,"tmda":20000,"impactosMensual":714030,"zonas":["Oeste"]},"306":{"pasajerosMensual":1172811,"tmda":20000,"impactosMensual":1772811,"zonas":["Oeste"]},"310":{"pasajerosMensual":108849,"tmda":20000,"impactosMensual":708849,"zonas":["Norte"]},"315":{"pasajerosMensual":561302,"tmda":20000,"impactosMensual":1161302,"zonas":["Norte","Oeste"]},"322":{"pasajerosMensual":384973,"tmda":20000,"impactosMensual":984973,"zonas":["Oeste"]},"325":{"pasajerosMensual":206873,"tmda":20000,"impactosMensual":806873,"zonas":["Oeste"]},"326":{"pasajerosMensual":86944,"tmda":20000,"impactosMensual":686944,"zonas":["Oeste"]},"327":{"pasajerosMensual":542051,"tmda":20000,"impactosMensual":1142051,"zonas":["Oeste"]},"336":{"pasajerosMensual":163683,"tmda":20000,"impactosMensual":763683,"zonas":["Oeste"]},"365":{"pasajerosMensual":2566192,"tmda":20000,"impactosMensual":3166192,"zonas":["Norte","Oeste"]},"370":{"pasajerosMensual":13749,"tmda":20000,"impactosMensual":613749,"zonas":["Sur"]},"371":{"pasajerosMensual":69118,"tmda":20000,"impactosMensual":669118,"zonas":["Sur"]},"373":{"pasajerosMensual":367710,"tmda":20000,"impactosMensual":967710,"zonas":["Sur"]},"378":{"pasajerosMensual":635943,"tmda":20000,"impactosMensual":1235943,"zonas":["Oeste"]},"382":{"pasajerosMensual":624749,"tmda":20000,"impactosMensual":1224749,"zonas":["Oeste"]},"388":{"pasajerosMensual":912547,"tmda":20000,"impactosMensual":1512547,"zonas":["Oeste"]},"396":{"pasajerosMensual":879949,"tmda":20000,"impactosMensual":1479949,"zonas":["Oeste"]},"404":{"pasajerosMensual":508901,"tmda":20000,"impactosMensual":1108901,"zonas":["Oeste"]},"410":{"pasajerosMensual":92149,"tmda":20000,"impactosMensual":692149,"zonas":["Sur"]},"422":{"pasajerosMensual":355810,"tmda":20000,"impactosMensual":955810,"zonas":["Sur"]},"423":{"pasajerosMensual":701549,"tmda":20000,"impactosMensual":1401549,"zonas":["Sur"]},"426":{"pasajerosMensual":242549,"tmda":20000,"impactosMensual":842549,"zonas":["Sur"]},"428":{"pasajerosMensual":352949,"tmda":20000,"impactosMensual":952949,"zonas":["Sur"]},"435":{"pasajerosMensual":62149,"tmda":20000,"impactosMensual":662149,"zonas":["Sur"]},"436":{"pasajerosMensual":148810,"tmda":20000,"impactosMensual":748810,"zonas":["Sur"]},"440":{"pasajerosMensual":639349,"tmda":20000,"impactosMensual":1239349,"zonas":["Sur"]},"442":{"pasajerosMensual":378749,"tmda":20000,"impactosMensual":978749,"zonas":["Sur"]},"500":{"pasajerosMensual":374949,"tmda":20000,"impactosMensual":974949,"zonas":["Sur"]},"501":{"pasajerosMensual":28910,"tmda":20000,"impactosMensual":628910,"zonas":["Sur"]},"503":{"pasajerosMensual":546149,"tmda":20000,"impactosMensual":1146149,"zonas":["Sur"]},"505":{"pasajerosMensual":53210,"tmda":20000,"impactosMensual":653210,"zonas":["Sur"]},"511":{"pasajerosMensual":648649,"tmda":20000,"impactosMensual":1248649,"zonas":["Sur"]},"520":{"pasajerosMensual":823149,"tmda":20000,"impactosMensual":1423149,"zonas":["Sur"]}};
+
+        // Benchmarks CPM estimados (AR$ por 1000 impactos) - promedio mercado argentino 2026
+        const benchmarks = [
+            { nombre: "Facebook/Instagram Ads", cpm: 8000, color: "#1877F2" },
+            { nombre: "Google Search Ads", cpm: 12000, color: "#34A853" },
+            { nombre: "YouTube Pre-roll", cpm: 6000, color: "#FF0000" },
+            { nombre: "TV Abierta", cpm: 15000, color: "#8B5CF6" },
+            { nombre: "Vía Pública (cartel fijo)", cpm: 5000, color: "#F59E0B" },
+            { nombre: "Diario/Gráfica", cpm: 18000, color: "#6B7280" },
+        ];
+
+        let currentLine = null;
+        let campania = []; // {linea, lunetas, precio}
+
+        // ============ HELPERS ============
+        function fmt(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+            if (n >= 1000) return Math.round(n).toLocaleString("es-AR");
+            return n.toString();
+        }
+        function fmtPesos(n) { return "$" + Math.round(n).toLocaleString("es-AR"); }
+        function fmtFecha() {
+            const d = new Date();
+            return d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+        }
+
+        // ============ TAB SWITCHING ============
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelector('.tab:nth-child(' + ({impacto:1,roi:2,simulador:3,reportes:4}[tab]) + ')').classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // ============ TAB: IMPACTO ============
+        function filtrarLineas() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const zone = document.getElementById('zoneFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const select = document.getElementById('lineSelect');
+
+            let keys = Object.keys(data).filter(linea => {
+                const info = data[linea];
+                return linea.toLowerCase().includes(search) && (zone === 'ALL' || info.zonas.includes(zone));
+            });
+
+            if (sort === 'IMPACT_DESC') keys.sort((a, b) => data[b].impactosMensual - data[a].impactosMensual);
+            else keys.sort((a, b) => (parseInt(a)||0) - (parseInt(b)||0));
+
+            select.innerHTML = '<option value="" disabled selected>Elegí una Línea (' + keys.length + ')...</option>';
+            keys.forEach(l => { select.innerHTML += '<option value="' + l + '">Línea ' + l + '</option>'; });
+            document.getElementById('placa').style.display = 'none';
+        }
+
+        function actualizarPlaca() {
+            const linea = document.getElementById('lineSelect').value;
+            if (!linea) return;
+            currentLine = linea;
+            const info = data[linea];
+            if (!info) return;
+
+            const pM = info.pasajerosMensual, vM = info.tmda * 30;
+            const iM = info.impactosMensual, iD = iM / 30;
+            let tags = info.zonas.map(z => '<span class="zone-tag">' + z + '</span>').join(' ');
+
+            document.getElementById('placaTitle').innerHTML = 'Línea ' + linea + ' ' + tags;
+            document.getElementById('pasajerosMensual').innerText = fmt(pM);
+            document.getElementById('pasajerosDiario').innerText = fmt(pM / 30) + ' / día';
+            document.getElementById('vehiculosMensual').innerText = fmt(vM);
+            document.getElementById('vehiculosDiario').innerText = fmt(info.tmda) + ' / día';
+            document.getElementById('impactosMensual').innerText = fmt(iM);
+            document.getElementById('impactosDiario').innerText = fmt(iD) + ' impactos diarios';
+            document.getElementById('placa').style.display = 'block';
+        }
+
+        function copiarResumenImpacto() {
+            if (!currentLine) return;
+            const info = data[currentLine];
+            const txt = `🚌 *Reporte de Impacto - Línea ${currentLine}*\n📍 Cobertura: ${info.zonas.join(', ')}\n\n👥 ${fmt(info.pasajerosMensual)} pasajeros/mes\n🚗 ${fmt(info.tmda * 30)} vehículos/mes\n\n🔥 *${fmt(info.impactosMensual)} impactos mensuales* por unidad ploteada\n\n🔗 Fuentes: Min. Transporte (SUBE) + Dir. Nal. Vialidad`;
+            navigator.clipboard.writeText(txt).then(() => alert('¡Copiado!'));
+        }
+
+        // ============ TAB: ROI ============
+        function calcularROI() {
+            const linea = document.getElementById('roiLineSelect').value;
+            const precio = parseFloat(document.getElementById('roiPrecio').value);
+            const lunetas = parseInt(document.getElementById('roiLunetas').value) || 0;
+            const duracion = parseInt(document.getElementById('roiDuracion').value) || 1;
+
+            if (!linea || !precio || !lunetas) { document.getElementById('roiResults').style.display = 'none'; return; }
+
+            const info = data[linea];
+            if (!info) return;
+
+            const inversion = precio * lunetas * duracion;
+            const impactosMes = info.impactosMensual * lunetas;
+            const impactosTotales = impactosMes * duracion;
+            const cpm = (impactosTotales > 0) ? (inversion / impactosTotales * 1000) : 0;
+            const cpi = (impactosTotales > 0) ? (inversion / impactosTotales) : 0;
+
+            document.getElementById('roiInversion').innerText = fmtPesos(inversion);
+            document.getElementById('roiInversionDetail').innerText = fmtPesos(precio) + ' × ' + lunetas + ' lun × ' + duracion + ' mes';
+            document.getElementById('roiCPM').innerText = fmtPesos(cpm);
+            document.getElementById('roiCPI').innerText = fmtPesos(cpi);
+            document.getElementById('roiImpactosTotales').innerText = fmt(impactosTotales);
+            document.getElementById('roiImpactosDetail').innerText = fmt(impactosMes) + ' impactos/mes × ' + lunetas + ' lunetas';
+
+            renderComparison('roiComparison', cpm);
+            document.getElementById('roiResults').style.display = 'block';
+        }
+
+        function renderComparison(containerId, cpmOoh) {
+            const container = document.getElementById(containerId);
+            const allMedia = [{ nombre: "Media 500 (OOH Colectivos)", cpm: cpmOoh, color: "#2563eb" }, ...benchmarks];
+            const maxCpm = Math.max(...allMedia.map(m => m.cpm));
+
+            container.innerHTML = allMedia.map(m => {
+                const pct = maxCpm > 0 ? (m.cpm / maxCpm * 100) : 0;
+                const ratio = cpmOoh > 0 && m.cpm > 0 ? (m.cpm / cpmOoh).toFixed(1) : '—';
+                const ratioText = m.nombre.startsWith("Media 500") ? "Tu campaña" : (cpmOoh > 0 ? ratio + "x más caro" : "");
+                return `<div class="compare-row">
+                    <div class="compare-label">${m.nombre}</div>
+                    <div class="compare-bar-container">
+                        <div class="compare-bar" style="width:${pct}%;background:${m.color};">${fmtPesos(m.cpm)}</div>
+                    </div>
+                    <div class="compare-value">${ratioText}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function copiarResumenROI() {
+            const linea = document.getElementById('roiLineSelect').value;
+            const precio = parseFloat(document.getElementById('roiPrecio').value);
+            const lunetas = parseInt(document.getElementById('roiLunetas').value);
+            const duracion = parseInt(document.getElementById('roiDuracion').value);
+            const info = data[linea];
+            if (!info) return;
+            const inversion = precio * lunetas * duracion;
+            const impactosTotales = info.impactosMensual * lunetas * duracion;
+            const cpm = impactosTotales > 0 ? inversion / impactosTotales * 1000 : 0;
+            const txt = `💰 *ROI Campaña OOH - Línea ${linea}*\n\n💵 Inversión: ${fmtPesos(inversion)} (${fmtPesos(precio)} × ${lunetas} lunetas × ${duracion} meses)\n📊 Impactos totales: ${fmt(impactosTotales)}\n📈 CPM: ${fmtPesos(cpm)}\n📉 Costo por impacto: ${fmtPesos(inversion / impactosTotales)}\n\n🔥 *${fmt(impactosTotales)} visualizaciones* por ${fmtPesos(inversion)}`;
+            navigator.clipboard.writeText(txt).then(() => alert('¡Copiado!'));
+        }
+
+        // ============ TAB: SIMULADOR ============
+        function agregarLineaCampania() {
+            const linea = document.getElementById('simLineSelect').value;
+            const lunetas = parseInt(document.getElementById('simLunetas').value) || 1;
+            const precio = parseFloat(document.getElementById('simPrecio').value);
+            if (!linea || !precio) { alert('Elegí línea y poné precio'); return; }
+            if (campania.find(c => c.linea === linea)) { alert('Esa línea ya está en la campaña'); return; }
+            campania.push({ linea, lunetas, precio });
+            recalcularCampania();
+            // reset inputs
+            document.getElementById('simPrecio').value = '';
+            document.getElementById('simLunetas').value = '1';
+        }
+
+        function quitarLineaCampania(linea) {
+            campania = campania.filter(c => c.linea !== linea);
+            recalcularCampania();
+        }
+
+        function recalcularCampania() {
+            const duracion = parseInt(document.getElementById('simDuracion').value) || 1;
+            const vacia = campania.length === 0;
+            document.getElementById('simCampaniaVacia').style.display = vacia ? 'block' : 'none';
+            document.getElementById('simCampaniaContent').style.display = vaca ? 'none' : 'block';
+            if (vacia) return;
+
+            let totalLunetas = 0, totalInversion = 0, totalImpactos = 0;
+            const body = document.getElementById('simCampaniaBody');
+            body.innerHTML = '';
+
+            campania.forEach(c => {
+                const info = data[c.linea];
+                if (!info) return;
+                const impactosMes = info.impactosMensual * c.lunetas;
+                totalLunetas += c.lunetas;
+                totalInversion += c.precio * c.lunetas * duracion;
+                totalImpactos += impactosMes * duracion;
+
+                body.innerHTML += `<tr>
+                    <td class="line-col">${c.linea}</td>
+                    <td>${info.zonas.map(z => '<span class="zone-tag">' + z + '</span>').join(' ')}</td>
+                    <td>${c.lunetas}</td>
+                    <td>${fmtPesos(c.precio)}</td>
+                    <td>${fmt(impactosMes)}/mes</td>
+                    <td class="remove-col"><button class="btn btn-danger" onclick="quitarLineaCampania('${c.linea}')">✕</button></td>
+                </tr>`;
+            });
+
+            const cpm = totalImpactos > 0 ? (totalInversion / totalImpactos * 1000) : 0;
+            document.getElementById('simInversion').innerText = fmtPesos(totalInversion);
+            document.getElementById('simCPM').innerText = fmtPesos(cpm);
+            document.getElementById('simTotalLunetas').innerText = totalLunetas;
+            document.getElementById('simImpactosTotales').innerText = fmt(totalImpactos);
+            document.getElementById('simImpactosDetail').innerText = fmt(totalImpactos / duracion) + ' impactos/mes × ' + duracion + ' meses';
+
+            renderComparison('simComparison', cpm);
+        }
+
+        function copiarResumenSimulador() {
+            const duracion = parseInt(document.getElementById('simDuracion').value) || 1;
+            const cliente = document.getElementById('simCliente').value || 'Cliente';
+            let totalInv = 0, totalImp = 0, totalLun = 0;
+            let lineasTxt = campania.map(c => {
+                const info = data[c.linea];
+                const im = info ? info.impactosMensual * c.lunetas * duracion : 0;
+                const inv = c.precio * c.lunetas * duracion;
+                totalInv += inv; totalImp += im; totalLun += c.lunetas;
+                return `  • Línea ${c.linea}: ${c.lunetas} lunetas × ${fmtPesos(c.precio)} = ${fmtPesos(inv)}`;
+            }).join('\n');
+            const cpm = totalImp > 0 ? totalInv / totalImp * 1000 : 0;
+            const txt = `🎯 *Propuesta OOH — ${cliente}*\n⏱ Duración: ${duracion} mes(es)\n\n📋 Líneas:\n${lineasTxt}\n\n💵 *Inversión total: ${fmtPesos(totalInv)}*\n📊 *${fmt(totalImp)} impactos totales*\n📈 CPM: ${fmtPesos(cpm)}\n🚌 ${totalLun} lunetas en ${campania.length} líneas\n\n🔗 Media 500`;
+            navigator.clipboard.writeText(txt).then(() => alert('¡Copiado!'));
+        }
+
+        // ============ TAB: REPORTES ============
+        function generarReporte() {
+            if (campania.length === 0) { alert('Armá la campaña primero en el Simulador'); return; }
+            switchTab('reportes');
+            const duracion = parseInt(document.getElementById('simDuracion').value) || 1;
+            const cliente = document.getElementById('simCliente').value || 'Cliente';
+            const fecha = fmtFecha();
+            let totalInv = 0, totalImp = 0, totalLun = 0;
+
+            const rows = campania.map(c => {
+                const info = data[c.linea];
+                const imMes = info.impactosMensual * c.lunetas;
+                const imTotal = imMes * duracion;
+                const inv = c.precio * c.lunetas * duracion;
+                totalInv += inv; totalImp += imTotal; totalLun += c.lunetas;
+                return `<tr>
+                    <td style="font-weight:700;color:#1d4ed8;">Línea ${c.linea}</td>
+                    <td>${info.zonas.join(', ')}</td>
+                    <td>${c.lunetas}</td>
+                    <td>${fmtPesos(c.precio)}</td>
+                    <td>${fmt(imMes)}/mes</td>
+                    <td>${fmt(imTotal)}</td>
+                </tr>`;
+            }).join('');
+
+            const cpm = totalImp > 0 ? totalInv / totalImp * 1000 : 0;
+            const cpi = totalImp > 0 ? totalInv / totalImp : 0;
+
+            const compRows = [{ nombre: "Media 500 (su campaña)", cpm: cpm, color: "#1d4ed8" }, ...benchmarks].map(m => {
+                const ratio = (m.nombre.startsWith("Media 500") || cpm === 0) ? "" : (m.cpm / cpm).toFixed(1) + "x más caro";
+                return `<tr>
+                    <td>${m.nombre}</td>
+                    <td style="font-weight:700;">${fmtPesos(m.cpm)}</td>
+                    <td style="color:${ratio ? '#dc2626' : '#1d4ed8'};font-weight:700;">${ratio || "✅ Su campaña"}</td>
+                </tr>`;
+            }).join('');
+
+            const rp = document.getElementById('reportPreview');
+            rp.innerHTML = `
+                <div style="text-align:center;margin-bottom:20px;">
+                    <img src="https://i.ibb.co/N29Ts7WX/Logo-media-500-CIRCULAR-jpg.jpg" alt="Media 500" style="width:60px;border-radius:50%;margin-bottom:8px;">
+                    <h2 style="margin:0;">Reporte de Campaña OOH</h2>
+                    <div style="color:#6b7280;font-size:13px;margin-top:4px;">${fecha} — Preparado para ${cliente}</div>
+                </div>
+
+                <div class="rp-section">
+                    <div class="rp-label">Cliente:</div> ${cliente}
+                </div>
+                <div class="rp-section">
+                    <div class="rp-label">Duración:</div> ${duracion} mes(es)
+                </div>
+                <div class="rp-section">
+                    <div class="rp-label">Total de Lunetas:</div> ${totalLun} unidades en ${campania.length} líneas
+                </div>
+
+                <div class="rp-section" style="margin-top:16px;">
+                    <div class="rp-label">Detalle por Línea:</div>
+                    <table>
+                        <thead><tr><th>Línea</th><th>Zona</th><th>Lunetas</th><th>$ por Luneta</th><th>Impactos/mes</th><th>Impactos Total</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+
+                <div style="background:#eff6ff;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
+                    <div style="font-size:13px;color:#1d4ed8;font-weight:700;text-transform:uppercase;">Inversión Total</div>
+                    <div class="rp-highlight">${fmtPesos(totalInv)}</div>
+                    <div style="font-size:13px;color:#374151;margin-top:8px;">${fmt(totalImp)} impactos totales</div>
+                </div>
+
+                <div class="rp-section">
+                    <div class="rp-label">Métricas de Eficiencia:</div>
+                    <table>
+                        <tr><td style="font-weight:700;">CPM (costo por 1.000 impactos)</td><td>${fmtPesos(cpm)}</td></tr>
+                        <tr><td style="font-weight:700;">Costo por impacto individual</td><td>${fmtPesos(cpi)}</td></tr>
+                        <tr><td style="font-weight:700;">Impactos diarios promedio</td><td>${fmt(totalImp / (duracion * 30))}</td></tr>
+                    </table>
+                </div>
+
+                <div class="rp-section">
+                    <div class="rp-label">Comparación con Otros Medios:</div>
+                    <table>
+                        <thead><tr><th>Medio</th><th>CPM</th><th>vs. Su Campaña</th></tr></thead>
+                        <tbody>${compRows}</tbody>
+                    </table>
+                </div>
+
+                <div class="rp-footer">
+                    <strong>Media 500</strong> — Publicidad en Vía Pública<br>
+                    Fuentes de datos: Ministerio de Transporte (Red SUBE), Dirección Nacional de Vialidad (TMDA).<br>
+                    Los impactos son estimaciones basadas en datos oficiales de tránsito y pasajeros. Los CPM de otros medios son promedios de mercado (2026).
+                </div>
+            `;
+
+            document.getElementById('reporteVacio').style.display = 'none';
+            document.getElementById('reporteContent').style.display = 'block';
+        }
+
+        function copiarReporteTexto() {
+            const el = document.getElementById('reportPreview');
+            const txt = el.innerText;
+            navigator.clipboard.writeText(txt).then(() => alert('¡Reporte copiado como texto!'));
+        }
+
+        function imprimirReporte() {
+            const el = document.getElementById('reportPreview');
+            const win = window.open('', '_blank');
+            win.document.write('<html><head><title>Reporte Media 500</title><style>body{font-family:Segoe UI,Roboto,sans-serif;padding:40px;color:#111;}table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;}th{background:#f3f4f6;font-size:12px;}</style></head><body>' + el.innerHTML + '</body></html>');
+            win.document.close();
+            win.print();
+        }
+
+        // ============ INIT ============
+        function populateSelects() {
+            const keys = Object.keys(data).sort((a, b) => (parseInt(a)||0) - (parseInt(b)||0));
+            const opts = '<option value="" disabled selected>Elegí una Línea...</option>' + keys.map(l => '<option value="' + l + '">Línea ' + l + ' — ' + data[l].zonas.join('/') + '</option>').join('');
+
+            document.getElementById('lineSelect').innerHTML = opts;
+            document.getElementById('roiLineSelect').innerHTML = opts;
+            document.getElementById('simLineSelect').innerHTML = opts;
+        }
+
+        populateSelects();
+        filtrarLineas();
+    </script>
+</body>
+</html>
